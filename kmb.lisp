@@ -2,7 +2,7 @@
 ;Michael bobak@computer.org copywrite is (left leaning &) not transferable
 ; especially if any of the code is a collected from other opensrc
 (defvar *ins-pre* "*") ;instance prefix
-;accessor might merge w/soem garnet work someday  ;use triples
+;accessor might merge w/some garnet work someday  ;use triples
 (defun evaluable-str (str) (rm_comma str))
 ;(defgeneric asrt (i s))
 (defgeneric eval-km (s))
