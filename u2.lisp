@@ -1,4 +1,4 @@
-(defvar *dbg* t) ;M Bobak, old code I was going to rewrite 2open-up
+(defvar *dbg* t)
 (defun quote_str (s) (rm-colon (quote-str s)))
 ;;make so ins can also be [] vs just * (by convention) so easier to interoperate w/clips/pprj:pins
 (defvar *clp* nil) ;t ;use the clips ins version [] ;as soon as make sure the old behavior is the same
@@ -297,7 +297,6 @@
   (gv-cls i "instances of"))
 ;
 (defun has-star (s) (prefixp "*" (if (symbolp s) (symbol-name s) s)))
-(defun starts-w-hash (s) (prefixp "#" (if (symbolp s) (symbol-name s) s))) ;or just named-instancep
 ;(defvar *quote-all* t)
 (defun quoteable_p (s) ;str
   "if space then put quotes before print/assert"
@@ -305,9 +304,7 @@
 ;defun quoteable=p (s) ;str
 (defun quoteable-p (s) ;str
   "more stringent version, that also does anything not a #|ins"
-  (or (quoteable_p s) (not (or (numberp s) (has-star s))))
- ;(or (quoteable_p s) (not (or (numberp s) (has-star s) (named-instancep s))))
-  )
+  (or (quoteable_p s) (not (or (numberp s) (has-star s)))))
 ;(defun quoteable-p (s) ;str
 ;  (if *quote-all* (quoteable=p s)
 ;    (quoteable_p s)))
@@ -402,5 +399,84 @@
 
 (defun subclasses-of (cls) (gv- cls "subclasses"))
 (defun ins-of2 (cls) (flat1 (mapcar_ #'ins-of (cons cls (subclasses-of cls)))))
+;=newer:
+;-
+(defgeneric safe_v (s))
+;(defmethod safe_v ((s String)) (rm-colon (safe-trim s)))
+(defmethod safe_v ((s String)) (num-str (rm-colon (safe-trim s)))) ;want nums if there
+(defmethod safe_v (a) (safe_v (to-str a)))
+;(defmethod safe_v (sy) (intern (safe_v (symbol-name sy))))
+(defmethod safe_v ((sy symbol))  ;already in utr2.lisp
+  (let* ((s (symbol-name sy))
+     (p (position ":" s :test #'equal)))
+    (if (and (numberp p) (> p 1)) (intern (safe_v s)) ;
+      sy)))
+(defmethod safe_v ((c cons))
+  (when *dbg* (warn "do not send safe_v a cons"))
+  (cons (safe_v (car c)) (safe_v (cdr c))))
 
+(defun safe_al (a) ;already in utr2.lisp
+  "test if no lst in (b . c)"
+  (if (and (consp a) (not (consp (car a))) (not (consp (cdr a)))) a
+    (when *dbg* (warn "not safe alt_elt:~a" a))))
+
+(defun sv_al (i al)   ;SetValue s from alist
+  "set km values from alst"
+;(first-lv
+  (mapcar
+    ;#'(lambda (pr) (sv i (safe_v (car pr)) (safe_v (cdr pr))))
+    #'(lambda (pr) (when (safe_al pr) (sv i (safe_v (car pr)) (safe_v (cdr pr)))))
+    ;#'(lambda (pr) (sv i (safe_v (car pr)) (cdr pr))) ;see if can just insert value
+          al))
+;);maybe ret first-lv of al instead
+(defun sv_al_ (i al)   ;SetValue s from aything
+  (mapcar
+    ;#'(lambda (pr) (when (consp pr) (sv i (safe_v (first-lv pr)) (safe_v (rest-lv pr))))) 
+    #'(lambda (pr) (when (consp pr) (sv i (safe_v (car-lv pr)) (safe_v (cdr-lv pr)))))
+    al))
+(defun sv_al_f (i al)   ;SetValue s from aything
+    #'(lambda (pr) (when (consp pr) (let ((prl (flat1 pr))) ;don't use
+                      ;(sv i (safe_v (first-lv prl)) (safe_v (rest-lv prl)))
+                      (sv_al_ i prl)
+                      ))))
+(defun sv_al_1 (l) (sv_al_ (first-lv l) (rest-lv l))) ;map over c2q     ;ins only no cls
+;-
+;defun get_id_ (dl &optional (n nil))  ;xmls-idp
+;-
  
+(defun sv_al_gi (al &optional (c nil))   ;SetValue s from aything
+  ;let ((i (get_id_ al)))
+  (let ((i (assoc-v :id al)))
+    (when c (sv-cls i c))
+    (sv_al_ i al)))
+
+(defun sv_al_c (l)  ;same but sets cls, and gensyms it for insname ;close but squished ins together
+  (let* ((f (rm-colon (to-str (first-lv l))))
+     (i (gensym f))
+     ;(i (get_id_ (rest-lv l))) ;now need2map over parts of lst
+     )
+    (format t "~%~a"  f) ;dbg
+    (sv-cls i f)
+    ;(sv_al_f i (rest-lv l))
+    (sv_al_ i (flat1 (rest-lv l)))
+    )) ;map over c2q     ;could flat1 here
+;take c2q top type as cls, and pull :ID for each as insname &rest info the ins
+;  might str-cat cls _ id  for insname
+(defun sv_al_c2 (l &optional (c nil))  ;same but sets cls, and gensyms it for insname
+    ;(mapcar_ #'(lambda (p) (sv_al_gi p c)) l)
+    (sv_al_gi l c)
+    )
+(defun sv_al_c1 (l)  ;same but sets cls, and gensyms it for insname
+  (let* ((f (rm-colon (to-str (first-lv l)))))
+    (mapcar_ #'(lambda (p) (sv_al_c2 p f)) (rest-lv l))))
+;turn c1&c2 to sv_al_c_
+
+(defun sv_al_c_ (l)  ;same but sets cls, and gensyms it for insname
+  (let* ((f (rm-colon (to-str (first-lv l)))))
+    (mapcar_ #'(lambda (p) (sv_al_gi p f)) (rest-lv l))))
+;_ 
+;(defun starts_with (lst x)  ;km has starts-with
+;    "Is x a list whose first element is x?"
+;    (and (consp lst) (eql (first lst) x)))
+;- 
+
