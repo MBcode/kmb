@@ -480,3 +480,35 @@
 ;    (and (consp lst) (eql (first lst) x)))
 ;- 
 
+;=newer2:
+(defun s-ki (n) (when n (ki n)))
+(defun s-sn (sn)  (if (equal sn "format")  (str-cat sn "_") sn)) ;might expand
+;(defun s-sv (i s v) (when (and i s) (sv i (s-sn s) (safe_v v)))) ;might set v=nil
+(defun s-sv (i s v) (when (and i s)
+              (let ((s-v (safe_v v)))
+            (sv i (s-sn s) s-v) s-v))) ;ret v vs ins in this one, ....
+
+(defun sv-dl (i dl)   ;SetValue s from ~alist
+    "set km values from alst"
+    (mapcar #'(lambda (pr) (if (len-eq pr 2) (s-sv i (first pr) (second pr))
+                 (warn "not-dl:~a" pr)))
+        dl))
+
+(defun dl2insc (ins dl &optional (cls nil))
+  "ins w/cls" ;like the al&pl versions
+  (when cls (sv-cls ins cls))
+  (when dl (sv-dl ins dl)))
+
+(defun get_id-n (dl n)  ;find from avl an a w/n/cls w/in it, and ret cls+v
+  (let ((a (find n dl :key #'first :test #'search)))
+    (when a (str-cat n (second-lv a)))))
+(defun get_id (dl &optional (n nil))  ;xmls-idp
+  "get id value" ;from avl, len=2 lists
+  (let* ((i (find "id" dl :key #'first :test #'equal))
+         (id (if (fulll i) (second i) ;len-eq i 2 ,instead of fulll
+           ;(when n (find n dl :key #'first :test #'search))
+           (when n (get_id-n dl n))
+           )))
+     (if id id (when n (gensym n))) ;last resort
+    ))
+ 
