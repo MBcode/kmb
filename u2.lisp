@@ -112,8 +112,8 @@
 (defun ki_ (s) ;str  ;from/to #s left along, but for ins-names, still want it
   "clean up 2 KM id str_" ;like txt2kmId
   ;(ki (under_ (trim-punct2 s)))
-  (let ((str  (underscore ;under_ 
-		  (trim-punct2 (clean4echo (to-str s))))))
+  (let ((str  (rm-space (underscore ;under_ 
+		  (trim-punct2 (clean4echo (to-str s)))))))
     (if (digit_prefixp str) ;(numberp (numstr str)) 
       str
       (ki str))) ;so #'s not *ed
