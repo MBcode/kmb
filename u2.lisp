@@ -113,7 +113,7 @@
   "clean up 2 KM id str_" ;like txt2kmId
   ;(ki (under_ (trim-punct2 s)))
   (let ((str  (underscore ;under_ 
-		(trim-punct2 (to-str s)))))
+		  (trim-punct2 (clean4echo (to-str s))))))
     (if (digit_prefixp str) ;(numberp (numstr str)) 
       str
       (ki str))) ;so #'s not *ed
@@ -511,4 +511,24 @@
            )))
      (if id id (when n (gensym n))) ;last resort
     ))
- 
+;-
+(defun map-ins-of (fn cls) (mapcar_ fn (ins-of cls)))
+(defun map-ins-of_ (fn cls) (mapcar_ fn (ins-of2 cls))) 
+;-
+(defun parts2ins (ins parts)
+  "save all the slot-value pairs into the instance"
+  (let ((al (list2alst parts)))
+    (when al (sv_al ins al))))
+(defun al2ins (ins al)
+  "save all the slot-value pairs into the instance"
+  (when (listp al) (sv_al ins al)))
+
+(defun json2ins (n)
+  "for ldj.cl version for now"
+  ;(parts2ins n (get-jas n))
+  (al2ins n (get-jas n))
+  ) 
+;
+(defun pl2ins (ins pl)
+  "ins w/s,v from pl"
+  (al2ins ins (plist-to-alist pl)))
