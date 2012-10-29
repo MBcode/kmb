@@ -33,3 +33,8 @@ If kmq is built on kms, then just ref it's asd file as well.
 
 kmq -needs-> kms -needs-> kmb -needs-> km (which is now loadable via quicklisp)
  
+
+
+=instead of just streaming consider: http://storm-project.net/about/multi-language.html
+ but not just Thrift, consider Avro, &other formats as are useful, incl HPC ones (eg.hdf5).
+ 
