@@ -96,7 +96,8 @@
     (insCon pre s)))
 ;assume keep the same, but..
 (defmethod ki ((s Symbol) &optional (pre ""))
-  (intern (ki (symbol-name s) pre))
+ ;(intern (ki (symbol-name s) pre))
+  (intern (ki (underscore (safe-trim (symbol-name s))) pre))
  ;;if (prefixp "*" s) s
  ;(if (or *nostar* (prefixp "*" (symbol-name s))) s
  ;  (sym-cat "*" pre s))
@@ -172,7 +173,8 @@
 ;(defun cmp-cw (s) "cmp my&columbia parse for a word") ;diff version in colu.lisp 2cmp w/cea-parts lst
 (defun clean_se (s)
    (simple-replace-string "(. " "( "
-    (rm-strs '("(. .)" "(, ,)" "(: -)" "(: ;)"  "," ":" "(" ")" ";" "\\" "\"" "'") s)))
+    (rm-strs '("(. .)" "(, ,)" "(: -)" "(: ;)"  "," ":" "(" ")" ";" "\\" "\"" "'"
+               "\/") s)))
 (defun show_c (s)
   (mapcar #'show-c1 (explode- (clean_se s)))) ;
 (defgeneric show (s))
@@ -211,7 +213,9 @@
  (when (full s) ;so no ""
   (let* ((sl (if (prefixp "(" s) s
 	      (strl s)))
-	 (ret (eval-str (str-cat "(km '#$" (rm_comma sl) ")"))))
+	 (ret (eval-str (str-cat "(km '#$" (rm_comma 
+                                         (rm-bslash sl) ;(safe-trim sl) ;sl
+                                         ) ")"))))
     (if (full1 ret) (first-lv ret) 
       ret)))) ;if 1thing get it, else get list, ka+ 
 (defmethod ka ((s List))
@@ -304,7 +308,8 @@
 ;defun quoteable=p (s) ;str
 (defun quoteable-p (s) ;str
   "more stringent version, that also does anything not a #|ins"
-  (or (quoteable_p s) (not (or (numberp s) (has-star s)))))
+  (or (quoteable_p s) (not (or (numericp s) ;(numberp s) 
+                               (has-star s)))))
 ;(defun quoteable-p (s) ;str
 ;  (if *quote-all* (quoteable=p s)
 ;    (quoteable_p s)))
