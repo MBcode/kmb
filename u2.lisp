@@ -174,7 +174,7 @@
 (defun clean_se (s)
    (simple-replace-string "(. " "( "
     (rm-strs '("(. .)" "(, ,)" "(: -)" "(: ;)"  "," ":" "(" ")" ";" "\\" "\"" "'"
-               "\/") s)))
+               "\/" "\"\"") s)))
 (defun show_c (s)
   (mapcar #'show-c1 (explode- (clean_se s)))) ;
 (defgeneric show (s))
@@ -293,6 +293,7 @@
 (defun gv4 (i sn)  (ka- "the4" sn "of" (ki i)))
 ;
 (defun gv-1 (i sn) (first-lv (gv i sn)))
+(defun gvl (i sn) (first-lv (last-lv (gv i sn))))
 ;
 (defun class_of (i)
   (gv i "instance-of"))
