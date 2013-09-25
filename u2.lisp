@@ -174,7 +174,7 @@
 (defun clean_se (s)
    (simple-replace-string "(. " "( "
     (rm-strs '("(. .)" "(, ,)" "(: -)" "(: ;)"  "," ":" "(" ")" ";" "\\" "\"" "'"
-               "\/" "\"\"") s)))
+               "'" "\/" "\"\"") s)))
 (defun show_c (s)
   (mapcar #'show-c1 (explode- (clean_se s)))) ;
 (defgeneric show (s))
@@ -538,3 +538,16 @@
 (defun pl2ins (ins pl)
   "ins w/s,v from pl"
   (al2ins ins (plist-to-alist pl)))
+
+;new:
+(defun sv- (i sn val &optional (qtval 'auto) (also nil))  ;SetValue   ;if also='now then replaces
+  "set km value, but don't start the i"
+ ;let ((has (if also "also-has" "has")))
+ (let ((has (if also (if (eq also 'now) "now-has" "also-has") "has")))
+ ;(ka- (ki i) has (snvs sn val qtval))
+  (ka- i has (snvs sn val qtval))
+  ))  
+
+(defun sv-super (cls super)
+  (sv- cls "superclasses" super nil))
+ 
