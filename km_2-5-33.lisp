@@ -290,7 +290,8 @@ The variable +km-package+ is set to the KM package name that KM is in.
 ;;; a built-in. However, in MCL it's in the ccl not cl package, and so with
 ;;; KM's packaged version we need to explicitly import it to KM, in addition
 ;;; to the normal importing via :use '(:common-lisp) above
-#+MCL
+;#+MCL
+#+CCL
 (eval-when (:compile-toplevel :load-toplevel :execute)
    (import 'ccl:neq))
 |#
@@ -19672,7 +19673,8 @@ KM> (multiple-value-some #'demo '(-1 3 2))
 ;;; but it is NOT defined in openmcl
 ;;; #-(and MCL (not openmcl))
 ;;; REVISED: NEQ is now apparently defined in openmcl, so change the defn.
-#-MCL
+;#-MCL
+#-CCL
 (defun neq (a b) (not (eq a b)))
 
 ;;; (nlist 3) --> (1 2 3)
