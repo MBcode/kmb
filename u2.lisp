@@ -540,7 +540,8 @@
   (al2ins ins (plist-to-alist pl)))
 
 ;new:
-(defun sv- (i sn val &optional (qtval 'auto) (also nil))  ;SetValue   ;if also='now then replaces
+;defun sv- (i sn val &optional (qtval 'auto) (also nil))  ;SetValue   ;if also='now then replaces
+(defun sv- (i sn val &optional (qtval 'nil) (also nil))  ;SetValue   ;if also='now then replaces
   "set km value, but don't start the i"
  ;let ((has (if also "also-has" "has")))
  (let ((has (if also (if (eq also 'now) "now-has" "also-has") "has")))
