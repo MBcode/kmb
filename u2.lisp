@@ -208,13 +208,14 @@
 (defun ka1 (sl) "for a single value" ;needs parens
   (eval-str (str-cat "(km-unique '#$" sl ")")))
 (defun full1 (l) (and (fulll l) (eq (len l) 1)))
+(defun clean-slash (sl) (rm-bslash (rm-str "http://" sl))) ;for now
 (defmethod ka ((s String))  ;like eval-str2km above
   "KM assert string"
  (when (full s) ;so no ""
   (let* ((sl (if (prefixp "(" s) s
 	      (strl s)))
 	 (ret (eval-str (str-cat "(km '#$" (rm_comma 
-                                         (rm-bslash sl) ;(safe-trim sl) ;sl
+                                         (clean-slash sl) ;(rm-bslash sl) ;(safe-trim sl) ;sl
                                          ) ")"))))
     (if (full1 ret) (first-lv ret) 
       ret)))) ;if 1thing get it, else get list, ka+ 
